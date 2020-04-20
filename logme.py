@@ -45,7 +45,7 @@ class LogmeLogger(Thread):
 
     def echo(self, logtext):
         if not self.quiet:
-            print(logtext, end='', flush=True)
+            print(logtext.decode('utf8'), end='', flush=True)
             #sys.stdout.write(logtext)
             #sys.stdout.flush()
 
