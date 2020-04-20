@@ -19,7 +19,7 @@ class LogmeLogger(Thread):
         self.exit_code = None
     
     def format_str(self, string):
-        #string = re.sub('.*\x07', '', string, re.MULTILINE)
+        string = re.sub(b'.*\x07', b'', string, re.MULTILINE)
         string = string.replace(b'\n',b'\n' + bytes(datetime.now().strftime('%Y-%m-%d %H:%M:%S '),'utf8'))
         return string
 
