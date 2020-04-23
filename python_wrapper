@@ -1,0 +1,10 @@
+#!/bin/bash
+prefered='/usr/bin/python3 /usr/bin/python2 /usr/bin/python'
+needed='requests, argparse'
+for p in $prefered
+do
+  [ -x $p ] && $p -c "import $needed" 2>/dev/null && python=$p && break
+done
+[ "$python" ] && exec $python "$@"
+echo "Error: cannot find valid python distribution" >&2
+exit 127
