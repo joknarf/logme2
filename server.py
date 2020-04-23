@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!./python_wrapper
 import http.server
 
 PORT = 8888

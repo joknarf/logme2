@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!./python_wrapper
 import sys, re
-from subprocess import call, Popen, PIPE, DEVNULL
+from subprocess import call, Popen, PIPE
 from threading import Thread
 from time import sleep
 from datetime import datetime
@@ -20,7 +20,7 @@ class LogmeLogger(Thread):
     
     def format_str(self, string):
         string = re.sub(b'\x1b][^\x1b\x07]*\x07', b'', string, re.MULTILINE)
-        string = string.replace(b'\n',b'\n' + bytes(datetime.now().strftime('%Y-%m-%d %H:%M:%S '),'utf8'))
+        string = string.replace(b'\n',b'\n' + datetime.now().strftime('%Y-%m-%d %H:%M:%S ').encode('utf8'))
         return string
 
     def run(self):
@@ -45,9 +45,9 @@ class LogmeLogger(Thread):
 
     def echo(self, logtext):
         if not self.quiet:
-            print(logtext.decode('utf8'), end='', flush=True)
-            #sys.stdout.write(logtext)
-            #sys.stdout.flush()
+            #print(logtext.decode('utf8'), end='', flush=True)
+            sys.stdout.write(logtext.decode('utf8'))
+            sys.stdout.flush()
 
     def logwrite(self, logtext):
         pass    
@@ -71,11 +71,8 @@ class LogmeHTTP(LogmeLogger):
         }
 
     def api_call(self):
-        resp = requests.post( self.url, json=self.payload, timeout=10, headers={ 'Content-Type' : 'application/json' })
-
         try:
-            pass
-            #resp = requests.post( self.url, json=self.payload, timeout=10, headers={ 'Content-Type' : 'application/json' })
+            resp = requests.post( self.url, json=self.payload, timeout=10, headers={ 'Content-Type' : 'application/json' })
         except:
             sys.stderr.write('LOGme: API call failed\n')
             sys.stderr.flush()
@@ -103,6 +100,7 @@ class LogmeMysql(LogmeLogger):
         LogmeLogger.__init__(self, logfile, quiet)
         self.logid = ""
         self.mysql = None
+        self.devnull = open(os.devnull, 'w')
         self.logconnect()
 
     def sql_str(self, string):
@@ -112,9 +110,9 @@ class LogmeMysql(LogmeLogger):
     def logconnect(self):
         if not self.logid:
             sql = "insert into log set log_text='',log_begin=now();select last_insert_id()"
-            self.logid = Popen(LogmeMysql.MYSQL + ['-e', sql], stdout=PIPE, stderr=DEVNULL, encoding='utf8').communicate()[0].rstrip('\n')
+            self.logid = Popen(LogmeMysql.MYSQL + ['-e', sql], stdout=PIPE, stderr=self.devnull).communicate()[0].decode('utf8').rstrip('\n')
         if self.logid:
-            self.mysql = Popen(LogmeMysql.MYSQL, stdin=PIPE, stderr=DEVNULL, encoding='utf8')
+            self.mysql = Popen(LogmeMysql.MYSQL, stdin=PIPE, stderr=self.devnull)
         else:
             sys.stderr.write('Cannot connect to log DB\n')
             return False
@@ -139,6 +137,7 @@ class LogmeMysql(LogmeLogger):
         """close log facility """
         self.mysql.stdin.close()
         self.mysql.wait()
+        self.devnull.close()
 
 
 
