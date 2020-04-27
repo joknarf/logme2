@@ -27,6 +27,14 @@
  *
  * Permission is granted to distribute this software under any version
  * of the BSD and GPL licenses.
+ *
+ * Joknarf 2020:
+ *   - fix initial state
+ *   - fix missing break in case statement
+ *   - keep color codes for HTML output (ansi2html)
+ *   - offset 20 chars for timestamp 
+ *   - fix wrong tab calculation
+ *
  *******************************************************************/
 
 #include <iostream>
