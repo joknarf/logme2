@@ -74,13 +74,13 @@ class LogmeHTTP(LogmeLogger):
         try:
             resp = requests.post( self.url, json=self.payload, timeout=10, headers={ 'Content-Type' : 'application/json' })
         except:
-            sys.stderr.write('LOGme: API call failed\n')
+            sys.stderr.write('\nLOGme: API call failed\n')
             sys.stderr.flush()
             return False
         if resp and 'logid' in resp.json():
             self.payload['logid'] = resp.json()['logid']
         else:
-            sys.stderr.write('LOGme: Failed to retrive log_id\n')
+            sys.stderr.write(' \nLOGme: Failed to retrieve log_id\n')
             sys.stderr.flush()
             return False
         return True
@@ -114,7 +114,7 @@ class LogmeMysql(LogmeLogger):
         if self.logid:
             self.mysql = Popen(LogmeMysql.MYSQL, stdin=PIPE, stderr=self.devnull)
         else:
-            sys.stderr.write('Cannot connect to log DB\n')
+            sys.stderr.write('\nLOGme: Cannot connect to log DB\n')
             return False
         return True
 
@@ -128,7 +128,7 @@ class LogmeMysql(LogmeLogger):
             self.mysql.stdin.write(sql)
             self.mysql.stdin.flush()
         except:
-            sys.stderr.write("Try Reconnect to log DB\n")
+            sys.stderr.write("\nLOGme: Try Reconnect to log DB\n")
             self.logconnect()
             return False
         return True
